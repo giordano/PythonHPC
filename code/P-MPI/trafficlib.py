@@ -1,13 +1,11 @@
 import sys
 import numpy as np
 
-def initroad(road, density, seedval):
+def initroad(road, density):
 
     # Here we expect a road without halos
 
     n = len(road)
-
-    np.random.seed(seedval)
 
     rng = np.random.random(n)
 

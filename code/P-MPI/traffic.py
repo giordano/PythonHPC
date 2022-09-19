@@ -31,7 +31,6 @@ def main(argv):
             print(f"ERROR: ncell = {ncell} not a multiple of size = {size}")
         exit()
 
-    bigroad  = np.zeros(ncell,dtype=np.int32)
     newroad  = np.zeros(nlocal+2,dtype=np.int32)
     oldroad  = np.zeros(nlocal+2,dtype=np.int32)
 
@@ -50,14 +49,16 @@ def main(argv):
         # Initialise road accordingly using random number generator
         print(f"Initialising ...")
 
-        ncars = initroad(bigroad, density, seedval)
-
-        print(f"Actual Density of cars is {format(float(ncars)/float(ncell))}\n")
-        print(f"Scattering data ...")
-
-    comm.Scatter(bigroad, oldroad[1:nlocal+1], root=0)
+    np.random.seed(seedval)
+    ncars = np.zeros(1)
+    ncars_local = np.zeros(1)
+    for i in range(0, rank + 1):
+        ncars_local[0] = initroad(oldroad[1:nlocal+1], density)
+    comm.Reduce(ncars_local, ncars)
 
     if (rank == 0):
+        print(f"Actual Density of cars is {format(float(ncars[0])/float(ncell))}\n")
+        print(f"Scattering data ...")
         print(f"... done\n")
 
     # Compute neighbours
@@ -101,7 +102,7 @@ def main(argv):
 
             if (rank == 0):
 
-                print(f"At iteration {iter} average velocity is {float(nmove)/float(ncars):.6f}")
+                print(f"At iteration {iter} average velocity is {float(nmove)/float(ncars[0]):.6f}")
 
     comm.barrier()
 

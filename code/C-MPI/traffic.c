@@ -3,6 +3,7 @@
 
 #include <mpi.h>
 
+#include "uni.h"
 #include "traffic.h"
 
 int main(int argc, char **argv)
@@ -11,7 +12,7 @@ int main(int argc, char **argv)
 
   int ncell = 5120000;
 
-  int *oldroad, *newroad, *bigroad;
+  int *oldroad, *newroad;
 
   int i, iter, nmove, nmovelocal, ncars;
   int maxiter, printfreq;
@@ -60,29 +61,32 @@ int main(int argc, char **argv)
       newroad[i] = 0;
     }
 
-  if (rank == 0)
-    {
-      bigroad = (int *) malloc(ncell*sizeof(int));
+  if (rank == 0) {
 
       // Initialise road accordingly using random number generator
 
       printf("Initialising road ...\n");
-  
-      ncars = initroad(bigroad, ncell, density, SEED);
+  }
 
+  // seed random number generator
+  rinit(SEED);
+  int ncars_local = 0;
+  for (int i=0; i<=rank; i++) {
+      ncars_local = initroad(&oldroad[1], nlocal, density);
+  }
+  MPI_Reduce(&ncars_local, &ncars, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  if (rank == 0) {
       printf("...done\n");
       printf("Actual density is %f\n", (float) ncars / (float) ncell);
       printf("Scattering data ...\n");
     }
 
-  MPI_Scatter(bigroad,     nlocal, MPI_INT,
-	      &oldroad[1], nlocal, MPI_INT,
-	      0, MPI_COMM_WORLD);
 
   if (rank == 0)
-    {
-      printf("... done\n\n");
-    }
+      {
+          printf("... done\n\n");
+      }
 
   // Compute neighbours
 
@@ -140,7 +144,6 @@ int main(int argc, char **argv)
 
   if (rank == 0)
     {
-      free(bigroad);
 
       printf("\nFinished\n");
       printf("\nTime taken was  %f seconds\n", tstop-tstart);

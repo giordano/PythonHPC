@@ -1,13 +1,9 @@
 #include "uni.h"
 
-int initroad(int *road, int n, float density, int seed)
+int initroad(int *road, int n, float density)
 {
   int i, ncar;
   float rng;
-
-  // seed random number generator
-
-  rinit(seed);
 
   ncar = 0;
 

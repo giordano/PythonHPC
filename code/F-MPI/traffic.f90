@@ -14,10 +14,10 @@ program traffic
   integer rank, size, ierr, nlocal, rankup, rankdown
   integer, dimension(MPI_STATUS_SIZE) :: status
 
-  integer :: i, iter, nmove, nmovelocal, ncars
+  integer :: i, iter, nmove, nmovelocal, ncars, ncars_local
   real    :: density
 
-  integer, allocatable, dimension(:) :: newroad, oldroad, bigroad
+  integer, allocatable, dimension(:) :: newroad, oldroad
 
   double precision :: tstart, tstop
 
@@ -62,25 +62,25 @@ program traffic
   end do
 
   if (rank == 0) then
+    ! Initialise road accordingly using random number generator
+    write(*,*) 'Initialising ...'
+  end if
 
-     allocate(bigroad(ncell))
+  call rinit(5743)
+  ncars_local = 0
+  do i = 0, rank
+    ncars_local = initroad(oldroad(1), nlocal, density)
+  end do
+  call MPI_Reduce(ncars_local, ncars, 1, MPI_INTEGER, MPI_SUM, &
+      0, MPI_COMM_WORLD, ierr)
 
-     ! Initialise road accordingly using random number generator
-
-     write(*,*) 'Initialising ...'
-
-     ncars = initroad(bigroad, ncell, density, seed)
-
+  if (rank == 0) then
      write(*,*) '... done'
 
      write(*,*) 'Actual density of cars is ', float(ncars)/float(ncell)
      write(*,*) 'Scattering data ...'
 
   end if
-
-  call MPI_Scatter(bigroad,    nlocal, MPI_INTEGER, &
-                   oldroad(1), nlocal, MPI_INTEGER, &
-                   0, MPI_COMM_WORLD, ierr)
 
   if (rank == 0) then
 
@@ -137,8 +137,6 @@ program traffic
   deallocate(newroad)
 
   if (rank == 0) then
-
-     deallocate(bigroad)
 
      write(*,*)
      write(*,*) 'Finished'

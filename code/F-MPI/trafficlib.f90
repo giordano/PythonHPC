@@ -4,11 +4,9 @@ module trafficlib
 
   implicit none
 
-  integer, parameter :: seed = 5743
-
 contains
 
-integer function initroad(road, n, density, seedval)
+integer function initroad(road, n, density)
 
   integer :: n, seedval
   integer :: road(n)
@@ -17,7 +15,6 @@ integer function initroad(road, n, density, seedval)
   integer :: i, ncar
   real    :: rng
 
-  call rinit(seedval)
 
   ncar = 0
 
