@@ -9,22 +9,22 @@ int main(int argc, char **argv)
 {
   // Set the size of the road
 
-  int ncell = 10240000;
+  int ncell = 5120000;
 
   int *oldroad, *newroad, *bigroad;
 
   int i, iter, nmove, nmovelocal, ncars;
-  int maxiter, printfreq; 
+  int maxiter, printfreq;
 
-  float density; 
+  float density;
 
   double tstart, tstop;
 
   MPI_Status status;
   int rank, size, nlocal, rankup, rankdown;
 
-  maxiter = 1.024e9/((double) ncell);
-  printfreq = maxiter/10; 
+  maxiter = 1000 /* 1.024e10/((double) ncell) */;
+  printfreq = maxiter/10;
 
   // Set target density of cars
 
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
   // Start MPI
 
-  MPI_Init(NULL, NULL);  
+  MPI_Init(NULL, NULL);
 
   // Find size and rank
 
@@ -48,6 +48,7 @@ int main(int argc, char **argv)
       printf("Running on %d processes\n", size);
     }
 
+  ncell *= size;
   nlocal = ncell/size;
 
   oldroad = (int *) malloc((nlocal+2)*sizeof(int));
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
   tstart = MPI_Wtime();
 
   for (iter=1; iter<=maxiter; iter++)
-    { 
+    {
 
       // Implement halo swaps which now includes boundary conditions
 
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
 
       for (i=1; i<=nlocal; i++)
 	{
-	  oldroad[i] = newroad[i]; 
+	  oldroad[i] = newroad[i];
 	}
 
       if (iter%printfreq == 0)
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
 	      printf("At iteration %d average velocity is %f \n",
 		     iter, (float) nmove / (float) ncars);
 	    }
-	} 
+	}
     }
 
   MPI_Barrier(MPI_COMM_WORLD);

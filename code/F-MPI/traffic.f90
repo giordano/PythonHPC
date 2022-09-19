@@ -8,7 +8,7 @@ program traffic
 
 ! Set the size of the road
 
-  integer :: ncell = 10240000
+  integer :: ncell = 5120000
   integer :: maxiter, printfreq
 
   integer rank, size, ierr, nlocal, rankup, rankdown
@@ -21,7 +21,7 @@ program traffic
 
   double precision :: tstart, tstop
 
-  maxiter = 1.024e9/ncell
+  maxiter = 200
   printfreq = maxiter/10
 
 ! Set target density of cars
@@ -37,6 +37,7 @@ program traffic
   call MPI_Comm_size(MPI_COMM_WORLD, size, ierr)
   call MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)
 
+  ncell = ncell * size
   nlocal = ncell/size
 
   if (rank == 0) then
@@ -131,7 +132,7 @@ program traffic
   end do
 
   tstop = MPI_Wtime()
-  
+
   deallocate(oldroad)
   deallocate(newroad)
 
