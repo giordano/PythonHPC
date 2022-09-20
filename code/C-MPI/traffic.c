@@ -40,6 +40,9 @@ int main(int argc, char **argv)
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  ncell *= size;
+  nlocal = ncell/size;
+
   if (rank == 0)
     {
       printf("Running message-passing traffic model\n");
@@ -48,9 +51,6 @@ int main(int argc, char **argv)
       printf("Target density of cars is %f \n", density);
       printf("Running on %d processes\n", size);
     }
-
-  ncell *= size;
-  nlocal = ncell/size;
 
   oldroad = (int *) malloc((nlocal+2)*sizeof(int));
   newroad = (int *) malloc((nlocal+2)*sizeof(int));
