@@ -21,7 +21,7 @@ program traffic
 
   double precision :: tstart, tstop
 
-  maxiter = 200
+  maxiter = 1000
   printfreq = maxiter/10
 
 ! Set target density of cars
