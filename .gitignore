@@ -1,0 +1,4 @@
+/code/*/*.job.*
+/code/*/*.o
+/code/F-*/*.lst
+/code/F-*/*.mod
