@@ -8,7 +8,7 @@ program traffic
 
 ! Set the size of the road
 
-  integer :: ncell = 5120000
+  integer(kind=8) :: ncell = 5120000
   integer :: maxiter, printfreq
 
   integer rank, size, ierr, nlocal, rankup, rankdown

@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 {
   // Set the size of the road
 
-  int ncell = 5120000;
+  long int ncell = 5120000;
 
   int *oldroad, *newroad;
 
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
   if (rank == 0)
     {
       printf("Running message-passing traffic model\n");
-      printf("\nLength of road is %d\n", ncell);
+      printf("\nLength of road is %ld\n", ncell);
       printf("Number of iterations is %d \n", maxiter);
       printf("Target density of cars is %f \n", density);
       printf("Running on %d processes\n", size);
